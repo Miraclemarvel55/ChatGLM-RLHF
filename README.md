@@ -14,6 +14,7 @@
 - 实现更精细化的情人设定×
 ## 使用方法
 安装环境仿照，ChatGLM-6B官方那个即可
+
 1 修改自己想要的主人名字和昵称，执行
 ```python
 python data/generate_data.py
@@ -47,4 +48,4 @@ python chatglm_rlhf.py
     - 自己的小情人
     - 结合自己资料的检索和生成
 - 交流群
-    - QQ：598358788
+    - QQ：788598358
