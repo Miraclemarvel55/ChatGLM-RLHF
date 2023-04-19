@@ -48,4 +48,4 @@ python chatglm_rlhf.py
 - 交流群
     - QQ：788598358
 - 打赏
-    - <img src="https://s1.ax1x.com/2023/04/19/p9FRubn.jpg" alt="支付宝" style="zoom:30%;" />
+    - [开源不易，谢谢赞助我的动力](https://s1.ax1x.com/2023/04/19/p9FIUqe.png)
