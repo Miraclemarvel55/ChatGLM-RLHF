@@ -12,6 +12,7 @@
         - 主人的姓名
         - Robot的昵称
 - 实现更精细化的情人设定×
+- 结合自己资料的检索和生成×
 ## 使用方法
 安装环境仿照，ChatGLM-6B官方那个即可
 
@@ -44,8 +45,7 @@ python chatglm_rlhf.py
     - what is your relationship with 咩咩
         - 咩咩是我的主人给我起的昵称。
 ## 联系方式
-- 欢迎添加我的QQ：1556006967交流支持私人定制各个类型的GPT模型
-    - 自己的小情人
-    - 结合自己资料的检索和生成
 - 交流群
     - QQ：788598358
+- 打赏
+    - <img src="https://s1.ax1x.com/2023/04/19/p9FRubn.jpg" alt="支付宝" style="zoom:30%;" />
