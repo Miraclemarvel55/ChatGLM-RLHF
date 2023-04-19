@@ -19,6 +19,9 @@
 python data/generate_data.py
 ```
 2 基于自己的硬件情况，选择GPU设定。我这边有两张卡，所以可以使用cuda 0和1，但是至少要一张卡3090 24G因为action模型也就是ChatGLM是一定要在gpu上面的要不然实在太慢了。
+```python
+python chatglm_rlhf.py
+```
 
 ## 效果展示
 训练大约5个epoch，或者等到ratio几乎都是1的时候，代表模型生成的概率已经没有什么变化了，就可以体验一下了
