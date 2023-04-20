@@ -1,9 +1,7 @@
 # ChatGLM-RLHF
-对ChatGLM直接使用RLHF进行调整参数，无需传统的finetune|Modify ChatGLM params with only RLHF
-
 大部分的RLHF代码都是在分布式框架，不适合学习和使用，本代码的RLHF代码不需要Megatron或者deepspeed框架，
 只需要传统的炼丹torch和显卡就好了，RLHF的Critic用的ChatGLM的缩小版本，而Reward咱们直接使用一个和目标输出比较的相似度模型即可。
-这样只需要学习核心的PPO算法即可，其他的都是已经了解的模型和结构。非常有利于NLPer进军RLHF
+这样只需要学习核心的PPO算法即可，其他的都是已经了解的模型和结构。非常有利于NLPer进军RLHF，似乎看起来只需要RLHF也能finetune模型
 ## 功能：
 - RLHF数据格式的定义和使用√
 - 只用RLHF就对ChatGLM进行了微调√
@@ -11,6 +9,7 @@
     - 可以自定义
         - 主人的姓名
         - Robot的昵称
+- LLama-RLHF-only
 - 实现更精细化的情人设定×
 - 结合自己资料的检索和生成×
 ## 使用方法
@@ -47,5 +46,3 @@ python chatglm_rlhf.py
 ## 联系方式
 - 交流群
     - QQ：788598358
-- 打赏
-    - [开源不易，谢谢赞助我的动力](https://s1.ax1x.com/2023/04/19/p9FIUqe.png)

@@ -1,7 +1,7 @@
 """
 classes for ChatGLM RLHF
 Critic model
-Action model is ChatGLM, 所以可能省略
+Action model is ChatGLM, 所以可省略
 Reward model
 
 """
