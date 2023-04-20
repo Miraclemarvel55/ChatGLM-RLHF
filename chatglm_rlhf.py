@@ -137,8 +137,8 @@ def main(prompts_path):
             inputs, gen_len = generate_inputs(tokenizer, query=query, history=history_)
             input_ids = inputs["input_ids"].to(action_device)
             if query != "":
-                num_beams, num_return_sequences = 3, 2
-                num_beams, num_return_sequences = 1, 1
+                num_beams, num_return_sequences = 1, 1 # 3, 2 # set bigger if you have bigger compute memory
+                assert num_beams >= num_return_sequences, "candidates num should greater than returns num"
                 max_new_tokens = 8
                 gen_method = "greedy_search" if num_beams == 1 else "beam_search" 
                 generate_ = model.generate(input_ids=input_ids, do_sample=False, num_beams=num_beams, max_new_tokens=max_new_tokens,
@@ -153,7 +153,8 @@ def main(prompts_path):
             else:
                 # 将目标句直接用RL提升或降低它的概率，得到类似finetune的效果
                 sequences = input_ids
-                log_probs = get_log_probs_with_input_ids(input_ids, gen_max_len=gen_len).detach()
+                with torch.no_grad():
+                    log_probs = get_log_probs_with_input_ids(input_ids, gen_max_len=gen_len)
                 gen_texts = [history[-1][1]]
                 out_texts = tokenizer.batch_decode(sequences)
                 print("目标句直接用RL提升它的概率：", out_texts)
@@ -170,7 +171,6 @@ def main(prompts_path):
             # 确保都放到values所在的device
             rewards = torch.tensor(rewards, dtype=critic.dtype, device=critic.device)
             masks = masks.to(critic.device)
-            # compute gae
             def ppo(ppo_epochs=5, states= sequences,log_probs=log_probs, rewards=rewards, masks=masks, clip_param=0.2):
                 for ppo_epoch in range(ppo_epochs):
                     # compute new log probs
@@ -194,7 +194,7 @@ def main(prompts_path):
                     surr1 = ratio * advantages
                     surr2 = torch.clamp(ratio, 1.0 - clip_param, 1.0 + clip_param) * advantages
                     actor_loss  = - torch.min(surr1, surr2).mean()
-                    critic_loss = value_estimator_delta.pow(2).mean()
+                    critic_loss = value_estimator_delta.square().mean()
                     loss = 0.5 * (critic_loss + actor_loss) - 0.001 * entropy
                     # optimize
                     optimizer.zero_grad()

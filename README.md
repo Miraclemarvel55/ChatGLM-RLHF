@@ -9,7 +9,7 @@
     - 可以自定义
         - 主人的姓名
         - Robot的昵称
-- LLama-RLHF-only
+- LLama-RLHF-only×
 - 实现更精细化的情人设定×
 - 结合自己资料的检索和生成×
 ## 使用方法
