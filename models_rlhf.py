@@ -76,6 +76,12 @@ class RewardBySimilarity(nn.Module):
         sentences = gen_texts + good_answers + bad_answers
         # Tokenize sentences
         encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+        # temporal truncate position_ids
+        batch_size, max_seq_len = encoded_input["input_ids"].shape
+        if max_seq_len > self.model.config.max_position_embeddings:
+            encoded_input["position_ids"] = torch.arange(max_seq_len).expand((1, -1)).repeat(batch_size, 1)
+            encoded_input["position_ids"] = encoded_input["position_ids"]/max_seq_len*self.model.config.max_position_embeddings
+            encoded_input["position_ids"] = encoded_input["position_ids"].floor().long()
         # Compute token embeddings
         with torch.no_grad():
             encoded_input = encoded_input.to(self.model.device)

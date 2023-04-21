@@ -1,5 +1,5 @@
 # ChatGLM-RLHF
-大部分的RLHF代码都是在分布式框架，不适合学习和使用，本代码的RLHF代码不需要Megatron或者deepspeed框架，
+本代码的RLHF代码不需要Megatron或者deepspeed框架，
 只需要传统的炼丹torch和显卡就好了，RLHF的Critic用的ChatGLM的缩小版本，而Reward咱们直接使用一个和目标输出比较的相似度模型即可。
 这样只需要学习核心的PPO算法即可，其他的都是已经了解的模型和结构。非常有利于NLPer进军RLHF，似乎看起来只需要RLHF也能finetune模型
 ## 功能：
@@ -9,6 +9,7 @@
     - 可以自定义
         - 主人的姓名
         - Robot的昵称
+- 更通用的Reward模型
 - LLama-RLHF-only×
 - batch 化生成多个不同的prompt，再同时RLHF
 - 实现更精细化的情人设定×
