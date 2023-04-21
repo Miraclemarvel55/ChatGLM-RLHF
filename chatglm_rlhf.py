@@ -201,6 +201,7 @@ def main(prompts_path):
                     loss.backward()
                     optimizer.step()
                     print("loss", loss)
+            torch.cuda.empty_cache()
             ppo()
 
 if __name__ == "__main__":
