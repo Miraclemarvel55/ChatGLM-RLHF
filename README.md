@@ -47,3 +47,4 @@ python chatglm_rlhf.py
 ## 联系方式
 - 交流群
     - QQ群：788598358
+    - 微信群：[微信group可能会过期，方便的话先加QQ群](https://s1.ax1x.com/2023/04/21/p9AbljI.png)
