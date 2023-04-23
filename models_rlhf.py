@@ -9,7 +9,8 @@ import torch
 from chatglm_local.modeling_chatglm import ChatGLMModel
 from torch import nn
 from transformers import BertTokenizer, BertModel
-
+import numpy as np
+from functools import partial
 
 """
 critic 的词表最好和action模型的词表一样这样便于对每个生成的token进行打分，
@@ -56,6 +57,20 @@ def mean_pooling(model_output, attention_mask):
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
+def jaccard(s1, s2):
+    """
+    可能有字符串重合但是语义不一致问题，
+    TODO 可以用多阶的jaccard来解决
+    """
+    assert len(s1)+len(s2)>0
+    s1 = set(s1)
+    s2 = set(s2)
+    s_or = s1 | s2
+    s_and = s1 & s2
+    jaccard_distance = len(s_and)/len(s_or)
+    return jaccard_distance
+
+
 class RewardBySimilarity(nn.Module):
     def __init__(self, device="cpu") -> None:
         super().__init__()
@@ -68,12 +83,14 @@ class RewardBySimilarity(nn.Module):
         self.device = device
     def forward(self, gen_texts=["你好"],
                  good_answers=['你好', "hello"],
-                 bad_answers=['再见', 'bye bye']):
-        example_num = (len(good_answers)+len(bad_answers))
+                 bad_answers=['再见', 'bye bye'],
+                 weight_for_cos_and_jaccard = [0.7, 0.3]):
+        examples = good_answers + bad_answers
+        example_num = len(examples)
         assert len(gen_texts)>0 and example_num>0
         reward_direction = torch.ones(example_num, device=self.model.device)
         reward_direction[len(good_answers):] = -1
-        sentences = gen_texts + good_answers + bad_answers
+        sentences = gen_texts + examples
         # Tokenize sentences
         encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
         # temporary truncate position_ids
@@ -95,7 +112,12 @@ class RewardBySimilarity(nn.Module):
             gen_text_vecs_ = gen_text_vecs[i:i+1]
             # 用一下广播计算cos
             coses = torch.cosine_similarity(gen_text_vecs_, answers_vecs, dim=1)
-            value, index = coses.max(dim=-1)
+            # 计算 jaccard距离
+            jaccard_s1 = partial(jaccard, gen_texts[i])
+            jaccards = torch.tensor(np.vectorize(jaccard_s1)(examples), dtype=coses.dtype, device=coses.device)
+            jaccards_scale_shift = jaccards*2-1
+            similarity = weight_for_cos_and_jaccard[0]*coses + weight_for_cos_and_jaccard[1]*jaccards_scale_shift
+            value, index = similarity.max(dim=-1)
             reward_.append(value*reward_direction[index])
         reward = torch.stack(reward_)
         return reward

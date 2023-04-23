@@ -6,7 +6,7 @@
 - RLHF数据格式的定义和使用√
 - 只用RLHF就对ChatGLM进行了微调√
 - 让ChatGLM认主√
-    - 可以自定义
+    - 修改自我认知钢印
         - 主人的姓名
         - Robot的昵称
 - 更通用的Reward模型×
@@ -48,4 +48,4 @@ python chatglm_rlhf.py
 ## 联系方式
 - 交流群
     - QQ群：788598358
-    - 微信群：[微信group可能会过期，方便的话先加QQ群](https://github.com/Miraclemarvel55/ChatGLM-RLHF/blob/main/docs/%E5%BE%AE%E4%BF%A1%E7%BE%A4.png)
+    - 微信群：[微信group可能会过期](https://github.com/Miraclemarvel55/ChatGLM-RLHF/blob/main/docs/%E5%BE%AE%E4%BF%A1%E7%BE%A4.png)

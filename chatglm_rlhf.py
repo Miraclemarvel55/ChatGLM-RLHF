@@ -1,6 +1,6 @@
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-os.environ["CUDA_VISIBLE_DEVICES"] = "3,4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5"
 import inspect
 import sys
 print(sys.path)
@@ -175,17 +175,18 @@ def main(prompts_path):
                 for ppo_epoch in range(ppo_epochs):
                     # compute new log probs
                     new_log_probs = get_log_probs_with_input_ids(states, log_probs.shape[1])
-                    entropy = 0
+                    entropy = 0 # 暂时不需要熵的约束
                     # compute value
                     # 到奖励模型和值函数模型的输入可以是一样的都是生成的序列。
                     # 生成序列同时包括state和next action
-                    # prepare input for reward model
+                    # prepare input for critic model
                     input_ids_critic =  states.to(critic_device)
                     values = critic(input_ids=input_ids_critic)
                     # compute gae
                     gae = gae_vectorize(values=values, rewards=rewards, masks=masks)
                     advantages = gae[:, -log_probs.shape[-1]:].to(new_log_probs.device)
-                    # 计算value的估计量的偏差以及其他loss
+                    # 计算value的估计量的偏差作为actor loss
+                    # 以及ppo的actor_loss
                     value_estimator_delta = advantages
                     ratio = (new_log_probs - log_probs).exp()
                     print("reward",reward, "ratio:", ratio, sep="\n")
