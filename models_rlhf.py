@@ -84,7 +84,8 @@ class RewardBySimilarity(nn.Module):
     def forward(self, gen_texts=["你好"],
                  good_answers=['你好', "hello"],
                  bad_answers=['再见', 'bye bye'],
-                 weight_for_cos_and_jaccard = [0.7, 0.3]):
+                 weight_for_cos_and_jaccard = [0.7, 0.3],
+                 thresh_cos_good=0.75):
         examples = good_answers + bad_answers
         example_num = len(examples)
         assert len(gen_texts)>0 and example_num>0
@@ -112,6 +113,8 @@ class RewardBySimilarity(nn.Module):
             gen_text_vecs_ = gen_text_vecs[i:i+1]
             # 用一下广播计算cos
             coses = torch.cosine_similarity(gen_text_vecs_, answers_vecs, dim=1)
+            # 余弦截断
+            coses[(coses>0) & (coses<thresh_cos_good)] -= thresh_cos_good
             # 计算 jaccard距离
             jaccard_s1 = partial(jaccard, gen_texts[i])
             jaccards = torch.tensor(np.vectorize(jaccard_s1)(examples), dtype=coses.dtype, device=coses.device)
