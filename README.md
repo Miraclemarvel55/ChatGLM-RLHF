@@ -1,6 +1,6 @@
 # ChatGLM-RLHF
-本代码的RLHF代码不需要Megatron或者deepspeed框架，
-只需要传统的炼丹torch和显卡就好了，RLHF的Critic用的ChatGLM的缩小版本，而Reward咱们直接使用一个和目标输出比较的相似度模型即可。
+本代码的RLHF代码不需要Megatron或者deepspeed框架，也不需要专门下载RL的库，实现的RLHF的PPO只需要不到100行即可，轻松阅读。
+有炼丹torch和transformers就好了，RLHF的Critic用的ChatGLM的缩小版本，而Reward咱们直接使用一个和目标输出比较的相似度模型即可（基于相似度的Reward比较通用，如有需要可以自己实现各自场景更适合的Reward模型）。
 这样只需要学习核心的PPO算法即可，其他的都是已经了解的模型和结构。非常有利于NLPer进军RLHF，似乎看起来只需要RLHF也能finetune模型
 ## 功能：
 - RLHF数据格式的定义和使用√
@@ -10,7 +10,7 @@
         - 主人的姓名
         - Robot的昵称
 - 更通用的Reward模型×
-- LLama-RLHF-only×
+- LLaMA-MOSS-RLHF×
 - batch 化生成多个不同的prompt，再同时RLHF×
 - 实现更精细化的情人设定×
 - 结合自己资料的检索和生成×
@@ -21,7 +21,7 @@
 ```python
 python data/generate_data.py
 ```
-2 基于自己的硬件情况，选择GPU设定。我这边有两张卡，所以可以使用cuda 0和1，但是至少要一张卡3090 24G因为action模型也就是ChatGLM是一定要在gpu上面的要不然实在太慢了。
+2 基于自己的硬件情况，选择CPU、GPU设定。我这边有两张卡，所以可以使用cuda 0和1，但是至少要一张卡3090 24G。训练的话因为action模型也就是ChatGLM是一定要在gpu上面的要不然实在太慢了。如果只是为了学习算法和调试观察张量流的变化，全部在CPU上面内存较大也是OK的，这样没有GPU的同学也能跟进和实践最新的NLP技术。
 ```python
 python chatglm_rlhf.py
 ```

@@ -70,7 +70,7 @@ def jaccard(s1, s2):
     jaccard_distance = len(s_and)/len(s_or)
     return jaccard_distance
 
-
+# 基于和good_answers和bad_answers比较的Reward模型，具有通用性和易学习，基本上都是基于Bert余弦值
 class RewardBySimilarity(nn.Module):
     def __init__(self, device="cpu") -> None:
         super().__init__()
@@ -94,6 +94,7 @@ class RewardBySimilarity(nn.Module):
         sentences = gen_texts + examples
         # Tokenize sentences
         encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+        ids = self.tokenizer.batch_encode_plus(sentences, add_special_tokens=False)["input_ids"]
         # temporary truncate position_ids
         batch_size, max_seq_len = encoded_input["input_ids"].shape
         if max_seq_len > self.model.config.max_position_embeddings:
@@ -116,8 +117,8 @@ class RewardBySimilarity(nn.Module):
             # 余弦截断
             coses[(coses>0) & (coses<thresh_cos_good)] -= thresh_cos_good
             # 计算 jaccard距离
-            jaccard_s1 = partial(jaccard, gen_texts[i])
-            jaccards = torch.tensor(np.vectorize(jaccard_s1)(examples), dtype=coses.dtype, device=coses.device)
+            jaccard_s1 = partial(jaccard, ids[i])
+            jaccards = torch.tensor(np.vectorize(jaccard_s1)(ids[-len(examples):]), dtype=coses.dtype, device=coses.device)
             jaccards_scale_shift = jaccards*2-1
             similarity = weight_for_cos_and_jaccard[0]*coses + weight_for_cos_and_jaccard[1]*jaccards_scale_shift
             value, index = similarity.max(dim=-1)
