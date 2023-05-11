@@ -84,8 +84,7 @@ class RewardBySimilarity(nn.Module):
     def forward(self, gen_texts=["你好"],
                  good_answers=['你好', "hello"],
                  bad_answers=['再见', 'bye bye'],
-                 weight_for_cos_and_jaccard = [0.7, 0.3],
-                 thresh_cos_good=0.75):
+                 weight_for_cos_and_jaccard = [0.5, 0.5]):
         examples = good_answers + bad_answers
         example_num = len(examples)
         assert len(gen_texts)>0 and example_num>0
@@ -93,7 +92,7 @@ class RewardBySimilarity(nn.Module):
         reward_direction[len(good_answers):] = -1
         sentences = gen_texts + examples
         # Tokenize sentences
-        encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+        encoded_input = self.tokenizer(sentences, padding=True, return_tensors='pt')
         ids = self.tokenizer.batch_encode_plus(sentences, add_special_tokens=False)["input_ids"]
         # temporary truncate position_ids
         batch_size, max_seq_len = encoded_input["input_ids"].shape
@@ -115,12 +114,11 @@ class RewardBySimilarity(nn.Module):
             # 用一下广播计算cos
             coses = torch.cosine_similarity(gen_text_vecs_, answers_vecs, dim=1)
             # 余弦截断
-            coses[(coses>0) & (coses<thresh_cos_good)] -= thresh_cos_good
+            coses[(coses<0)] = 0
             # 计算 jaccard距离
             jaccard_s1 = partial(jaccard, ids[i])
-            jaccards = torch.tensor(np.vectorize(jaccard_s1)(ids[-len(examples):]), dtype=coses.dtype, device=coses.device)
-            jaccards_scale_shift = jaccards*2-1
-            similarity = weight_for_cos_and_jaccard[0]*coses + weight_for_cos_and_jaccard[1]*jaccards_scale_shift
+            jaccards = torch.tensor(np.vectorize(jaccard_s1)(np.array(ids[-len(examples):], dtype=object)), dtype=coses.dtype, device=coses.device)
+            similarity = weight_for_cos_and_jaccard[0]*coses + weight_for_cos_and_jaccard[1]*jaccards
             value, index = similarity.max(dim=-1)
             reward_.append(value*reward_direction[index])
         reward = torch.stack(reward_)
