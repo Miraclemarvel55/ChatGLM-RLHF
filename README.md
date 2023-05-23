@@ -10,7 +10,7 @@
         - 主人的姓名
         - Robot的昵称
 - 更通用的Reward模型×
-- LLaMA-MOSS-RLHF×即将上线
+- ![LLaMA-MOSS-RLHF√](https://github.com/Miraclemarvel55/LLaMA-MOSS-RLHF-LoRA)
 - batch 化生成多个不同的prompt，再同时RLHF×
 - 实现更精细化的情人设定×
 - 结合自己资料的检索和生成×
